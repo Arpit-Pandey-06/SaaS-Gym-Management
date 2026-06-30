@@ -1,0 +1,5 @@
+node_modules
+mock
+.next
+eslint.config.mjs
+next-env.d.ts
