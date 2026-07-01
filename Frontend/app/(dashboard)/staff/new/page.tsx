@@ -19,7 +19,7 @@ const schema = z.object({
   phone: z.string().min(10, "Valid phone required"),
   role: z.enum(["receptionist", "manager", "cleaner", "maintenance", "other"]),
   branchId: z.string().min(1, "Select a branch"),
-  salary: z.coerce.number().min(1000, "Enter monthly salary"),
+  salary: z.number().min(1000, "Enter monthly salary"),
 });
 type FormData = z.infer<typeof schema>;
 

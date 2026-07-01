@@ -19,8 +19,8 @@ const schema = z.object({
   phone: z.string().min(10, "Valid phone required"),
   gender: z.enum(["male", "female", "other"]),
   branchId: z.string().min(1, "Select a branch"),
-  experience: z.coerce.number().min(0, "Enter experience in years"),
-  salary: z.coerce.number().min(1000, "Enter monthly salary"),
+  experience: z.number().min(0, "Enter experience in years"),
+  salary: z.number().min(1000, "Enter monthly salary"),
   specialization: z.string().min(1, "At least one specialization required"),
 });
 type FormData = z.infer<typeof schema>;
