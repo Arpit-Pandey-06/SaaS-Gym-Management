@@ -11,3 +11,91 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id             String        @id @default(cuid())
+  full_name      String        @db.VarChar(255)
+  email          String        @unique @db.VarChar(255)
+  password_hash  String        @db.VarChar(255)
+  phone_number   String        @unique @db.VarChar(20)
+  role           Role          @default(User)
+  account_status AccountStatus @default(ACTIVE)
+  gyms           Gym[]
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+}
+
+enum Role {
+  Platform_Admin
+  Owner
+  Manager
+  Trainer
+  User
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  BLOCKING
+  PENDING
+}
+
+model Gym {
+  id              String            @id @default(cuid())
+  user            User              @relation(fields: [userId], references: [id])
+  userId          String
+  gym_name        String
+  subscriptions   GymSubscription[]
+  business_email  String            @unique @db.VarChar(255)
+  business_phone  String            @db.VarChar(20)
+  logo_url        String?
+  website         String?
+  gst_number      String?           @db.VarChar(50)
+  register_number String?           @db.VarChar(50)
+  address         String?           @db.VarChar(255)
+  city            String?           @db.VarChar(255)
+  state           String?           @db.VarChar(255)
+  country         String?           @db.VarChar(100)
+  postal_code     String?           @db.VarChar(50)
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+}
+
+model SubscriptionPlan {
+  id              String            @id @default(cuid())
+  plan_name       String            @db.VarChar(255)
+  description     String            @db.VarChar(255)
+  price           Decimal           @db.Decimal(9, 2)
+  gymSubscription GymSubscription[]
+  max_branches    Int?
+  max_managers    Int?
+  max_trainers    Int?
+  max_members     Int?
+  storage_limit   Int
+  billing_cycle   Int
+  status          AccountStatus     @default(ACTIVE)
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+}
+
+model GymSubscription {
+  id                   String           @id @default(cuid())
+  gym                  Gym              @relation(fields: [gymId], references: [id])
+  gymId                String
+  subscriptionPlan     SubscriptionPlan @relation(fields: [subscription_plan_id], references: [id])
+  subscription_plan_id String
+  start_date           DateTime?
+  end_date             DateTime?
+  payment_status       PaymentStatus    @default(SUCCESSFUL)
+  subscription_status  AccountStatus    @default(ACTIVE)
+  auto_renew           Boolean?
+  created_at           DateTime         @default(now())
+  updated_at           DateTime         @updatedAt
+}
+
+enum PaymentStatus {
+  SUCCESSFUL
+  FAILED
+  PENDING
+  DUE
+}
