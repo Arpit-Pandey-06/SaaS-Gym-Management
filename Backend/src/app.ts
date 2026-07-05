@@ -1,5 +1,10 @@
 import express from "express"
+import authrouter from "./routes/AuthRegister.routes.ts"
+
 
 const app   = express()
+app.use(express.json())
 
-export default app
+app.use("/api/v1/auth",authrouter)
+
+export default app 

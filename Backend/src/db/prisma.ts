@@ -1,7 +1,7 @@
 import { Pool } from "pg";
-import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient } from "../generated/prisma/client.ts";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { config } from "../config/envconfig";
+import { config } from "../config/envconfig.ts";
 
 
 
@@ -26,4 +26,4 @@ const prisma = new PrismaClient({adapter})
 
 
 
-export default prisma
+export default prisma 

@@ -3,7 +3,7 @@ import { config } from "./src/config/envconfig.ts";
 
 const PORT:number = config.PORT
 
-app.listen(PORT|7000,()=>{
+app.listen(PORT,()=>{
     console.log("app running");
     console.log(PORT)
     

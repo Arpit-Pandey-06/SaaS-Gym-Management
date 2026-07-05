@@ -17,7 +17,7 @@ model User {
   full_name      String        @db.VarChar(255)
   email          String        @unique @db.VarChar(255)
   password_hash  String        @db.VarChar(255)
-  phone_number   String        @unique @db.VarChar(20)
+  phone_number   String?       @unique @db.VarChar(20)
   role           Role          @default(User)
   account_status AccountStatus @default(ACTIVE)
   gyms           Gym[]
@@ -47,7 +47,7 @@ model Gym {
   gym_name        String
   subscriptions   GymSubscription[]
   business_email  String            @unique @db.VarChar(255)
-  business_phone  String            @db.VarChar(20)
+  business_phone  String?           @db.VarChar(20)
   logo_url        String?
   website         String?
   gst_number      String?           @db.VarChar(50)
