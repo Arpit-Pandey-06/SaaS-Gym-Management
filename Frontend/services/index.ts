@@ -1,13 +1,13 @@
 /**
- * Service Layer — currently returns mock data.
- * Replace these functions with Axios calls when backend is ready.
- * Keep all function signatures identical — only the internals change.
+ * Mock Service Layer — for modules not yet connected to backend.
+ * Auth is handled by services/auth.service.ts (real API).
+ * Replace each service below with real Axios calls as backend modules are ready.
  */
 
 import {
   Member, Trainer, Staff, Branch, MembershipPlan,
   Attendance, Payment, TableFilters, PaginatedResponse,
-  User, Notification,
+  Notification,
 } from "@/types";
 import {
   mockMembers, mockTrainers, mockStaff, mockBranches,
@@ -25,53 +25,6 @@ function paginate<T>(arr: T[], page = 1, limit = 10): PaginatedResponse<T> {
 function delay(ms = 400): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
-
-// ─── Auth Service ────────────────────────────────────────────
-export const authService = {
-  async login(email: string, password: string): Promise<{ user: User; token: string }> {
-    await delay();
-    if (email && password) {
-      return {
-        token: "mock-jwt-token-fitsaas",
-        user: {
-          id: "user-1",
-          name: "Arpit Sharma",
-          email,
-          role: "owner",
-          gymId: "gym-1",
-          createdAt: "2024-01-01",
-        },
-      };
-    }
-    throw new Error("Invalid credentials");
-  },
-
-  async forgotPassword(email: string): Promise<void> {
-    await delay();
-    if (!email) throw new Error("Email required");
-  },
-
-  async resetPassword(token: string, password: string): Promise<void> {
-    await delay();
-    if (!token || !password) throw new Error("Invalid request");
-  },
-
-  async logout(): Promise<void> {
-    await delay(100);
-  },
-
-  async getMe(): Promise<User> {
-    await delay(200);
-    return {
-      id: "user-1",
-      name: "Arpit Sharma",
-      email: "arpit@fitsaas.com",
-      role: "owner",
-      gymId: "gym-1",
-      createdAt: "2024-01-01",
-    };
-  },
-};
 
 // ─── Dashboard Service ───────────────────────────────────────
 export const dashboardService = {

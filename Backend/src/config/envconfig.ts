@@ -17,8 +17,13 @@ function envload(name:string):string{
 
 const config =  {
     PORT :  parseInt(envload("PORT")),
-    DATABASE_URL : envload("DATABASE_URL")
+    DATABASE_URL : envload("DATABASE_URL"),
+    JWT_ACCESS_TOKEN_SECRET:envload("JWT_ACCESS_TOKEN_SECRET"),
+    JWT_REFRESH_TOKEN_SECRET:envload("JWT_REFRESH_TOKEN_SECRET"),
+    JWT_ACCESS_TOKEN_EXPIRE:envload("JWT_ACCESS_TOKEN_EXPIRE"),
+    JWT_REFRESH_TOKEN_EXPIRE:envload("JWT_REFRESH_TOKEN_EXPIRE"),
+    JWT_ALGORITHM:envload("JWT_ALGORITHM")
+    
 
 }
-
 export {config}

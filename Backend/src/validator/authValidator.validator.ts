@@ -16,11 +16,6 @@ import { ApiError } from "../utils/ApiError.utils.ts";
         .withMessage("Emails is required")
         .isEmail()
         .withMessage("Email is not email format"),
-
-    body("role")
-        .trim()
-        .notEmpty()
-        .withMessage("Role is required"),
     
     body("password")
         .trim()

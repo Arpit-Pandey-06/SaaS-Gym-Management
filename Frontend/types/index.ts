@@ -1,15 +1,16 @@
 // ─── Auth & User ─────────────────────────────────────────────
-export type UserRole = "owner" | "admin" | "receptionist" | "trainer";
+export type UserRole = "Owner" | "Admin" | "Receptionist" | "Trainer" | "Platform_Admin";
 
 export interface User {
   id: string;
-  name: string;
+  full_name: string;       // backend field name
   email: string;
   role: UserRole;
-  avatar?: string;
-  gymId: string;
+  account_status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
+  gymId?: string;
   branchId?: string;
-  createdAt: string;
+  avatar?: string;
+  createdAt?: string;
 }
 
 export interface AuthState {
@@ -268,4 +269,53 @@ export interface Notification {
   isRead: boolean;
   createdAt: string;
   link?: string;
+}
+
+// ─── Auth API contracts (aligned with backend) ────────────────
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  success: boolean;
+  message: string;
+  data: {
+    access_token: string;
+    user: User;
+  };
+}
+
+export interface RegisterRequest {
+  full_name: string;
+  email: string;
+  password: string;
+  gym_name: string;
+  business_email: string;
+}
+
+export interface RegisterResponse {
+  success: boolean;
+  message: string;
+  data: {
+    id: string;
+    full_name: string;
+    email: string;
+    role: UserRole;
+  };
+}
+
+export interface MeResponse {
+  success: boolean;
+  data: User;
+}
+
+export interface RefreshResponse {
+  success: boolean;
+  data: { access_token: string };
+}
+
+export interface LogoutResponse {
+  success: boolean;
+  message: string;
 }

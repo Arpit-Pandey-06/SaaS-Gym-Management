@@ -9,7 +9,7 @@ import {
   CreditCard, ClipboardList, BarChart3, Settings, LogOut,
   ChevronLeft, Utensils, BriefcaseMedical, Bell, User, Activity
 } from "lucide-react";
-import { authService } from "@/services";
+import { authService } from "../../services/auth.service";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui";
 
@@ -74,14 +74,14 @@ export function Sidebar() {
         {!isCollapsed && (
           <div className="flex items-center gap-2.5">
             <div className="h-8 w-8 rounded-lg bg-brand flex items-center justify-center flex-shrink-0">
-              <Link href="/dashboard"><Dumbbell className="h-4 w-4 text-white" /></Link>
+              <Dumbbell className="h-4 w-4 text-white" />
             </div>
             <span className="font-semibold text-sm text-foreground">FitSaaS</span>
           </div>
         )}
         {isCollapsed && (
           <div className="h-8 w-8 rounded-lg bg-brand flex items-center justify-center">
-               <Link href="/dashboard"><Dumbbell className="h-4 w-4 text-white" /></Link>
+            <Dumbbell className="h-4 w-4 text-white" />
           </div>
         )}
         {!isCollapsed && (
@@ -146,9 +146,9 @@ export function Sidebar() {
 
         {!isCollapsed ? (
           <div className="flex items-center gap-2 px-2 py-2 mt-1 rounded-lg">
-            <Avatar name={user?.name ?? "User"} size="sm" />
+            <Avatar name={user?.full_name ?? "User"} size="sm" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium truncate">{user?.name}</p>
+              <p className="text-xs font-medium truncate">{user?.full_name}</p>
               <p className="text-[10px] text-muted-foreground truncate capitalize">{user?.role}</p>
             </div>
             <button

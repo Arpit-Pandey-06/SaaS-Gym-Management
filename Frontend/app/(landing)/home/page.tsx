@@ -73,7 +73,7 @@ function Navbar() {
         </div>
         <div className="hidden md:flex items-center gap-3">
           <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 px-3 py-1.5 transition-colors">Sign in</Link>
-          <Link href="/login" className="text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 transform">Start free trial</Link>
+          <Link href="/register" className="text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 transform">Start free trial</Link>
         </div>
         <button className="md:hidden p-2 text-gray-600" onClick={() => setOpen(!open)}>{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
       </nav>
@@ -82,7 +82,7 @@ function Navbar() {
           {links.map(l => <a key={l.label} href={l.href} className="block text-sm text-gray-600 py-2 font-medium" onClick={() => setOpen(false)}>{l.label}</a>)}
           <div className="pt-2 space-y-2 border-t border-gray-100">
             <Link href="/login" className="block text-center text-sm text-gray-600 py-2">Sign in</Link>
-            <Link href="/login" className="block text-center bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold">Start free trial</Link>
+            <Link href="/register" className="block text-center bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold">Start free trial</Link>
           </div>
         </div>
       )}
@@ -192,7 +192,7 @@ function FeatureModal({ feature, onClose }: { feature: string; onClose: () => vo
             </li>
           ))}
         </ul>
-        <Link href="/login" className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors text-sm" onClick={onClose}>
+        <Link href="/register" className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors text-sm" onClick={onClose}>
           Try this feature free <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
@@ -342,7 +342,7 @@ function PricingSection() {
                 ))}
               </ul>
 
-              <Link href={p.monthlyPrice ? "/login" : "mailto:hello@fitsaas.com"}
+              <Link href={p.monthlyPrice ? "/register" : "mailto:hello@fitsaas.com"}
                 className={cn("text-center py-3 rounded-xl text-sm font-semibold transition-all hover:-translate-y-0.5 transform",
                   p.highlight ? "bg-white text-blue-600 hover:bg-blue-50 shadow" : "bg-blue-600 text-white hover:bg-blue-700"
                 )}>
@@ -630,7 +630,7 @@ export default function LandingPage() {
             FitSaaS gives gym owners a single platform to manage members, staff, trainers, attendance, payments, and reports — across every branch, from any device.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16 animate-[fade-in_0.8s_ease-out]">
-            <Link href="/login" className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-blue-200 hover:-translate-y-0.5 transform text-sm">
+            <Link href="/register" className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-blue-200 hover:-translate-y-0.5 transform text-sm">
               Start free trial — no card needed <ArrowRight className="h-4 w-4" />
             </Link>
             <a href="#features" className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 hover:border-gray-300 text-gray-700 font-medium px-7 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 transform text-sm">
@@ -764,7 +764,7 @@ export default function LandingPage() {
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to modernise your gym?</h2>
               <p className="text-blue-100 mb-8 text-[15px] max-w-lg mx-auto leading-relaxed">Join 500+ gym owners who replaced spreadsheets with FitSaaS. Set up in minutes, results in days.</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link href="/login" className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 hover:bg-blue-50 font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 transform text-sm shadow-lg">
+                <Link href="/register" className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 hover:bg-blue-50 font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 transform text-sm shadow-lg">
                   Start free trial <ArrowRight className="h-4 w-4" />
                 </Link>
                 <a href="mailto:hello@fitsaas.com" className="inline-flex items-center justify-center border border-blue-400 text-white hover:bg-blue-500 font-medium px-8 py-3.5 rounded-xl transition-colors text-sm">

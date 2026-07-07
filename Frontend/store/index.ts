@@ -7,8 +7,11 @@ interface AuthStore {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  isAuthLoading: boolean;        // true while initAuth() is running on startup
   setAuth: (user: User, token: string) => void;
+  setToken: (token: string) => void;
   clearAuth: () => void;
+  setAuthLoading: (v: boolean) => void;
   updateUser: (data: Partial<User>) => void;
 }
 
@@ -18,12 +21,22 @@ export const useAuthStore = create<AuthStore>()(
       user: null,
       token: null,
       isAuthenticated: false,
-      setAuth: (user, token) => set({ user, token, isAuthenticated: true }),
-      clearAuth: () => set({ user: null, token: null, isAuthenticated: false }),
+      isAuthLoading: true,        // start as true — assume loading until checked
+      setAuth: (user, token) => set({ user, token, isAuthenticated: true, isAuthLoading: false }),
+      setToken: (token) => set({ token }),
+      clearAuth: () => set({ user: null, token: null, isAuthenticated: false, isAuthLoading: false }),
+      setAuthLoading: (v) => set({ isAuthLoading: v }),
       updateUser: (data) =>
         set((s) => ({ user: s.user ? { ...s.user, ...data } : null })),
     }),
-    { name: "fitsaas-auth" }
+    {
+      name: "fitsaas-auth",
+      // Only persist user presence — token comes fresh from /refresh on every startup
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    }
   )
 );
 
@@ -73,7 +86,7 @@ export const useSidebarStore = create<SidebarStore>()(
   )
 );
 
-// ─── Branch Store (active branch filter) ──────────────────────
+// ─── Branch Store ─────────────────────────────────────────────
 interface BranchStore {
   activeBranchId: string | "all";
   setActiveBranch: (id: string | "all") => void;

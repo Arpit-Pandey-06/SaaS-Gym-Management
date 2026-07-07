@@ -3,12 +3,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { authService } from "@/services";
+import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store";
 import { useRouter } from "next/navigation";
 import { Button, Input, Label, Card, CardContent } from "@/components/ui";
 import { Dumbbell, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -21,31 +21,44 @@ type FormData = z.infer<typeof schema>;
 
 export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
-  const { setAuth } = useAuthStore();
+  const { setAuth, isAuthenticated, isAuthLoading } = useAuthStore();
   const router = useRouter();
+
+  // If already logged in, skip login page
+  useEffect(() => {
+    if (!isAuthLoading && isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthenticated, isAuthLoading, router]);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { email: "arpit@fitsaas.com", password: "password123" },
   });
 
   const onSubmit = async (data: FormData) => {
     try {
       const result = await authService.login(data.email, data.password);
       setAuth(result.user, result.token);
-      toast.success("Welcome back!");
-      router.push("/dashboard");
-    } catch {
-      toast.error("Invalid email or password");
+      toast.success(`Welcome back, ${result.user.full_name}!`);
+
+      // Redirect to the page they originally tried to visit, or dashboard
+      const redirect = sessionStorage.getItem("fitsaas-redirect") ?? "/dashboard";
+      sessionStorage.removeItem("fitsaas-redirect");
+      router.replace(redirect);
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message ?? "Invalid email or password";
+      toast.error(msg);
     }
   };
 
+  if (isAuthLoading || isAuthenticated) return null;
+
   return (
     <div className="w-full max-w-sm">
-      {/* Logo */}
       <div className="flex items-center gap-2.5 justify-center mb-8">
         <div className="h-9 w-9 rounded-xl bg-brand flex items-center justify-center">
-          <Link href="/"><Dumbbell className="h-5 w-5 text-white" /></Link>
+          <Dumbbell className="h-5 w-5 text-white" />
         </div>
         <span className="text-xl font-semibold">FitSaaS</span>
       </div>
@@ -60,34 +73,25 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@gym.com"
+              <Input id="email" type="email" placeholder="you@gym.com"
                 {...register("email")}
-                className={cn(errors.email && "border-destructive focus-visible:ring-destructive")}
-              />
+                className={cn(errors.email && "border-destructive")} />
               {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="/forgot-password" className="text-xs text-brand hover:underline">Forgot password?</Link>
+                <Link href="/forgot-password" className="text-xs text-brand hover:underline">
+                  Forgot password?
+                </Link>
               </div>
               <div className="relative">
-                <Input
-                  id="password"
-                  type={showPass ? "text" : "password"}
-                  placeholder="••••••••"
-                  {...register("password")}
-                  className={cn("pr-10", errors.password && "border-destructive focus-visible:ring-destructive")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
+                <Input id="password" type={showPass ? "text" : "password"}
+                  placeholder="••••••••" {...register("password")}
+                  className={cn("pr-10", errors.password && "border-destructive")} />
+                <button type="button" onClick={() => setShowPass(!showPass)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
@@ -99,16 +103,14 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="rounded-lg bg-muted p-3">
-            <p className="text-xs text-muted-foreground text-center font-medium mb-1">Demo credentials</p>
-            <p className="text-xs text-center text-muted-foreground">arpit@fitsaas.com / password123</p>
-          </div>
+          <p className="text-xs text-center text-muted-foreground">
+            New gym owner?{" "}
+            <Link href="/register" className="text-brand hover:underline font-medium">
+              Create account
+            </Link>
+          </p>
         </CardContent>
       </Card>
-
-      <p className="text-xs text-center text-muted-foreground mt-6">
-        © {new Date().getFullYear()} FitSaaS. All rights reserved.
-      </p>
     </div>
   );
 }
