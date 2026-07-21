@@ -22,12 +22,11 @@ export function RefreshToken(payload:Tokenpayload){
     }
 
 export function verifyAccessToken(token:string):any{
-    try{
+    try{        
     const payloadData = jwt.verify(token,config.JWT_ACCESS_TOKEN_SECRET) as Tokenpayload
     return payloadData
 }
     catch(errors){
-        console.log(errors)
         throw new Error("401 Unauthorized access")
         }
     }
@@ -39,7 +38,7 @@ export function verifyRefreshToken(token:string):any{
             return user_id
         }
         catch(err){
-            throw new Error("401 Unauthorized access")
+            // throw new Error("401 Unauthorized access")
         }
     }
 

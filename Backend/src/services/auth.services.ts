@@ -11,7 +11,7 @@ import {
   RefreshToken,
   verifyRefreshToken,
 } from "../utils/jwt.utils.ts";
-import { Role } from "../generated/prisma/enums.ts";
+import { BillingCycle, Role } from "../generated/prisma/enums.ts";
 import { cookie } from "express-validator";
 
 class AuthService {
@@ -32,16 +32,25 @@ class AuthService {
         full_name: data.full_name,
         email: data.email,
         password_hash: hashedpassword,
+        phone_number:data.phone_number,
+
         role: Role.Owner,
       });
       const gym = await AuthRepository.createGym(tx, {
         gym_name: data.gym_name,
-        userId: user.id,
+        ownerId: user.id,
         business_email: data.business_email,
+        business_phone:data.business_phone,
+        gym_legal_address:data.gym_legal_address,
+        timezone:data.timezone,
+        currency:data.currency,
+        register_number:data.register_number,
+        gst_number:data.gst_number
       });
       const gymSubscription = await AuthRepository.createSubscription(tx, {
         subscription_plan_id: subscriptionId.id,
         gymId: gym.id,
+        billing_cycle:BillingCycle.MONTHLY
       });
       return {
         user,
@@ -106,12 +115,8 @@ class AuthService {
   }
 
   async AccesstokenReGenration(data: string) {
-    const refresh = data;
-
-    const payload = verifyRefreshToken(refresh);
-
+    const payload = verifyRefreshToken(data);
     const user = await AuthRepository.FindUserById(payload);
-
     if (!user) {
       throw new Error("401 Unauthorized access");
     }
@@ -119,18 +124,16 @@ class AuthService {
     if (user.account_status !== "ACTIVE") {
       throw new Error("401 Unauthorized access account invalid status ");
     }
-
     const access_token_regenrated = AccessToken({
       id: user.id,
       role: user.role,
       email: user.email,
       status: user.account_status,
     });
-
     return access_token_regenrated;
   }
 
-  async getCurrentUser(user_id: string) {
+  async getCurrentUser(user_id: string) {    
     const user_info = await AuthRepository.FindUserById(user_id);
     if (!user_info) {
       return {

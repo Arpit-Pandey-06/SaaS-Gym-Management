@@ -10,4 +10,3 @@ export interface RefreshTokenInterface{
     userId: string;
     expires_at: Date;
 }
-

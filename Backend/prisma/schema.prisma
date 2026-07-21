@@ -13,32 +13,38 @@ datasource db {
 }
 
 model User {
-  id             String        @id @default(cuid())
-  full_name      String        @db.VarChar(255)
-  email          String        @unique @db.VarChar(255)
-  password_hash  String        @db.VarChar(255)
-  phone_number   String?       @unique @db.VarChar(20)
-  role           Role          @default(Member)
-  account_status AccountStatus @default(ACTIVE)
-  refresh_token  RefreshToken[]
-  gyms           Gym[]
-  created_at     DateTime      @default(now())
-  updated_at     DateTime      @updatedAt
+  id              String          @id @default(cuid())
+  full_name       String          @db.VarChar(255)
+  email           String          @unique @db.VarChar(255)
+  password_hash   String          @db.VarChar(255)
+  phone_number    String?         @unique @db.VarChar(20)
+  role            Role            @default(Member)
+  account_status  AccountStatus   @default(ACTIVE)
+  refresh_token   RefreshToken[]
+  owner_gym       Gym[]
+  member_profile  Member?
+  manger_profile  ManagerProfile?
+  trainer_profile TrainerProfile?
+  payment         Payment[]
+  attendence      Attendance[]
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
 }
 
 model RefreshToken {
-    id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
-    token_hash  String
+  token_hash String
 
-    userId      String @unique
-    user        User @relation(fields: [userId], references: [id])
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
 
-    expires_at  DateTime
+  email_verified Boolean? @default(false)
+  expires_at     DateTime
 
-    revoked_at  DateTime?
+  revoked_at DateTime?
 
-    created_at  DateTime @default(now())
+  created_at DateTime @default(now())
 }
 
 enum Role {
@@ -52,66 +58,455 @@ enum Role {
 enum AccountStatus {
   ACTIVE
   SUSPENDED
-  BLOCKING
+  INACTIVE
   PENDING
 }
 
 model Gym {
-  id              String            @id @default(cuid())
-  user            User              @relation(fields: [userId], references: [id])
-  userId          String
-  gym_name        String
-  subscriptions   GymSubscription[]
-  business_email  String            @unique @db.VarChar(255)
-  business_phone  String?           @db.VarChar(20)
-  logo_url        String?
-  website         String?
-  gst_number      String?           @db.VarChar(50)
-  register_number String?           @db.VarChar(50)
-  address         String?           @db.VarChar(255)
-  city            String?           @db.VarChar(255)
-  state           String?           @db.VarChar(255)
-  country         String?           @db.VarChar(100)
-  postal_code     String?           @db.VarChar(50)
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @updatedAt
+  id                String            @id @default(cuid())
+  owner             User              @relation(fields: [ownerId], references: [id])
+  ownerId           String
+  gym_name          String
+  subscriptions     GymSubscription[]
+  branches          Branch[]
+  membership_plan   MembershipPlan[]
+  business_email    String            @unique @db.VarChar(255)
+  gym_legal_address String ?           @unique @db.VarChar(200)
+  business_phone    String?           @db.VarChar(20)
+  logo_url          String?
+  website           String?
+  gst_number        String?           @db.VarChar(50)
+  register_number   String?           @db.VarChar(50)
+  timezone          String?           @db.VarChar(20)
+  currency          String?           @db.VarChar(20)
+  address           String?           @db.VarChar(255)
+  city              String?           @db.VarChar(255)
+  state             String?           @db.VarChar(255)
+  country           String?           @db.VarChar(100)
+  postal_code       String?           @db.VarChar(50)
+  status            AccountStatus     @default(ACTIVE)
+  deleted_at        DateTime?
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
 }
 
 model SubscriptionPlan {
-  id              String            @id @default(cuid())
-  plan_name       String            @db.VarChar(255)
-  description     String            @db.VarChar(255)
-  price           Decimal           @db.Decimal(9, 2)
-  gymSubscription GymSubscription[]
-  max_branches    Int?
-  max_managers    Int?
-  max_trainers    Int?
-  max_members     Int?
-  storage_limit   Int
-  billing_cycle   Int
-  status          AccountStatus     @default(ACTIVE)
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @updatedAt
+  id                      String            @id @default(cuid())
+  plan_name               String            @unique @db.VarChar(255)
+  trial_days              Int?              @default(7)
+  description             String            @db.VarChar(255)
+  monthly_price           Decimal           @db.Decimal(9, 2)
+  yearly_price            Decimal?          @db.Decimal(9, 2)
+  gymSubscription         GymSubscription[]
+  max_branches            Int
+  max_managers            Int
+  max_trainers            Int
+  max_members             Int
+  storage_limit           Int
+  billing_cycle           Int
+  allow_multiple_branches Boolean           @default(false)
+  allow_custom_branding   Boolean           @default(false)
+  allow_api_access        Boolean           @default(false)
+  allow_reports           Boolean           @default(false)
+  status                  AccountStatus     @default(ACTIVE)
+  created_at              DateTime          @default(now())
+  updated_at              DateTime          @updatedAt
 }
 
 model GymSubscription {
   id                   String           @id @default(cuid())
   gym                  Gym              @relation(fields: [gymId], references: [id])
   gymId                String
-  subscriptionPlan     SubscriptionPlan @relation(fields: [subscription_plan_id], references: [id])
+  subscription_plan    SubscriptionPlan @relation(fields: [subscription_plan_id], references: [id])
   subscription_plan_id String
+  billing_cycle        BillingCycle @default(MONTHLY)
   start_date           DateTime?
   end_date             DateTime?
-  payment_status       PaymentStatus    @default(SUCCESSFUL)
-  subscription_status  AccountStatus    @default(ACTIVE)
+  status               AccountStatus    @default(ACTIVE)
+  cancelled_at         DateTime?
+  payment_reference    String?
   auto_renew           Boolean?
   created_at           DateTime         @default(now())
   updated_at           DateTime         @updatedAt
 }
 
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+model Branch {
+  id String @id @default(cuid())
+  branch_code String @db.VarChar(20)
+  branch_name String @db.VarChar(56)
+  business_email String     @db.VarChar(120)
+  business_phone String     @db.VarChar(15)
+  branch_type    BranchType @default(MAIN)
+  emailVerified Boolean?
+  address     String @db.VarChar(256)
+  city        String @db.VarChar(64)
+  state       String @db.VarChar(32)
+  country     String @db.VarChar(32)
+  postal_code String @db.VarChar(12)
+  opening_time String        @db.VarChar(40)
+  closing_time String        @db.VarChar(40)
+  capacity     Int?
+  status       AccountStatus @default(ACTIVE)
+  deleted_at   DateTime?
+  gymId String
+  gym   Gym    @relation(fields: [gymId], references: [id])
+  managers          ManagerProfile[]
+  trainers_branches TrainerBranch[]
+  members           Member[]
+  attendance        Attendance[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  @@unique([gymId, branch_code])
+  @@unique([gymId, business_email])
+  @@unique([gymId, business_phone])
+  @@index([gymId])
+  @@index([status])
+  @@index([deleted_at])
+}
+
+enum BranchType {
+  MAIN
+  FRANCHISE
+}
+
+model ManagerProfile {
+  id                String   @id @default(cuid())
+  employee_code     String   @db.VarChar(56)
+  joining_date      DateTime
+  salary            Decimal? @db.Decimal(8, 2)
+  emergency_contact String?  @db.VarChar(20)
+  reporting_to      String?  @db.VarChar(20)
+  emergency_phone   String?  @db.VarChar(20)
+
+  notes      String?
+  status     AccountStatus @default(ACTIVE)
+  deleted_at DateTime?
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  branchId   String
+  branch     Branch   @relation(fields: [branchId], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([branchId, employee_code])
+  @@index([branchId])
+}
+
+model TrainerProfile {
+  id String @id @default(cuid())
+
+  employee_code String @db.VarChar(56)
+
+  specialization String? @db.VarChar(150)
+
+  experience_years Int?
+
+  joining_date DateTime
+
+  salary Decimal? @db.Decimal(8, 2)
+
+  emergency_contact    String?     @db.VarChar(20)
+  emergency_phone      String?     @db.VarChar(20)
+  trainer_type         TrainerType
+  certification_number String?     @db.VarChar(40)
+
+  notes String?
+
+  status     AccountStatus @default(ACTIVE)
+  deleted_at DateTime?
+
+  // Relations
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  trainer_branches TrainerBranch[]
+  member_trainer   MemberTrainer[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+enum TrainerType {
+  PERSONAL
+  GROUP
+  YOGA
+  CARDIO
+  STRENGTH
+}
+
+model TrainerBranch {
+  trainerId String
+  trainer   TrainerProfile @relation(fields: [trainerId], references: [id])
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  @@id([trainerId, branchId])
+}
+
+model Member {
+  id String @id @default(cuid())
+
+  // Business Identity
+  member_code String
+
+  joining_date DateTime
+
+  date_of_birth DateTime?
+
+  gender Gender?
+
+  blood_group BloodGroup?
+
+  emergency_contact String? @db.VarChar(20)
+  emergency_phone   String? @db.VarChar(20)
+
+  height Decimal? @db.Decimal(3, 2)
+  weight Decimal? @db.Decimal(4, 2)
+
+  medical_notes String? @db.VarChar(250)
+  fitness_goal  String? @db.VarChar(120)
+
+  status     AccountStatus @default(ACTIVE)
+  deleted_at DateTime?
+
+  // Relations
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  member_trainers MemberTrainer[]
+
+  memberships MemberMembership[]
+
+  attendances Attendance[]
+
+  payments Payment[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([branchId, member_code])
+  @@index([branchId])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum BloodGroup {
+  A_POSITIVE
+  A_NEGATIVE
+
+  B_POSITIVE
+  B_NEGATIVE
+
+  AB_POSITIVE
+  AB_NEGATIVE
+
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+model MemberTrainer {
+  id String @id @default(cuid())
+
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id])
+
+  trainerId String
+  trainer   TrainerProfile @relation(fields: [trainerId], references: [id])
+
+  is_primary Boolean @default(false)
+
+  assigned_date DateTime @default(now())
+
+  status AccountStatus @default(ACTIVE)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([memberId, trainerId])
+  @@index([memberId])
+  @@index([trainerId])
+}
+
+model MembershipPlan {
+  id String @id @default(cuid())
+
+  plan_name String
+
+  description String?
+
+  duration_days Int
+
+  price Decimal
+
+  admission_fee Decimal?
+
+  tax_percentage Decimal?
+
+  freeze_days_allowed Int @default(0)
+
+  status     AccountStatus @default(ACTIVE)
+  deleted_at DateTime?
+
+  gymId String
+  gym   Gym    @relation(fields: [gymId], references: [id])
+
+  member_memberships MemberMembership[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([gymId, plan_name])
+  @@index([gymId])
+}
+
+model MemberMembership {
+  id              String    @id @default(cuid())
+  renewed_from_id String?
+  freeze_start    DateTime?
+  freeze_end      DateTime?
+  notes           String?
+  memberId        String
+  member          Member    @relation(fields: [memberId], references: [id])
+
+  membership_plan_id String
+  membership_plan    MembershipPlan @relation(fields: [membership_plan_id], references: [id])
+
+  start_date DateTime
+
+  end_date DateTime
+
+  original_price Decimal
+
+  discount_amount Decimal @default(0)
+
+  final_price Decimal
+
+  payment_status PaymentStatus
+
+  membership_status MembershipStatus @default(ACTIVE)
+  payment           Payment[]
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+  @@index([memberId])
+  @@index([membership_status])
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  FROZEN
+}
+
 enum PaymentStatus {
-  SUCCESSFUL
-  FAILED
   PENDING
-  DUE
+  PARTIAL
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Attendance {
+  id String @id @default(cuid())
+
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id])
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  recorded_by String?
+  recorder    User?   @relation(fields: [recorded_by], references: [id])
+
+  attendance_date DateTime
+
+  check_in DateTime
+
+  check_out DateTime?
+
+  attendance_source AttendanceSource
+
+  attendance_status AttendanceStatus @default(PRESENT)
+
+  notes String?
+
+  created_at DateTime @default(now())
+
+  @@index([memberId])
+  @@index([branchId])
+  @@index([attendance_date])
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+}
+
+enum AttendanceSource {
+  MANUAL
+  QR_CODE
+  BIOMETRIC
+  MOBILE_APP
+}
+
+model Payment {
+  id             String  @id @default(cuid())
+  invoice_number String?
+  receipt_number String
+
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id])
+
+  member_membership_id String
+  member_membership    MemberMembership @relation(fields: [member_membership_id], references: [id])
+
+  collected_by String?
+  collector    User?   @relation(fields: [collected_by], references: [id])
+
+  amount Decimal
+
+  payment_method PaymentMethod
+
+  payment_status PaymentStatus
+
+  transaction_reference String?
+
+  payment_date DateTime
+
+  remarks String?
+
+  created_at DateTime @default(now())
+
+  @@unique([receipt_number])
+  @@index([memberId])
+  @@index([member_membership_id])
+  @@index([payment_date])
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+  CREDIT_CARD
+  DEBIT_CARD
+  NET_BANKING
+  CHEQUE
 }

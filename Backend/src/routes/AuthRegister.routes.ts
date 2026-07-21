@@ -13,4 +13,4 @@ route.get("/me",accesstokenVerify,AuthRegister.getCurrentUser)
 route.post("/refresh",AuthRegister.RefreshToken)
 route.post("/logout",AuthRegister.Logout)
 
-export default route 
+export default route  
