@@ -5,6 +5,20 @@ import { BranchType } from "../generated/prisma/enums.ts";
 import Branch_Repository from "../repository/Branch.repository.ts"
 import {branch_code_genrator} from "../utils/branch_code.ts"
 import { emailSend,verificaionEmail } from "../utils/mailGeneration.ts";
+// import {UpdateBranchDTO} from "../utils/Payload.utils.ts"
+type UpdateBranchDTO = {
+    branch_name:string,
+    business_email:string,
+    business_phone:string,
+    address:string,
+    city:string,
+    state:string,
+    country:string,
+    postal_code:string,
+    capacity:string,
+    opening_time:string,
+    closing_time:string,
+}
 
 
 class Branch_Services{
@@ -113,7 +127,13 @@ class Branch_Services{
             if(!gym){
                 throw new Error("401 Gym Not Found")
             }
-        const branch = await Branch_Repository.get_branch(branch_code,gym.id)
+        const branch_info = await Branch_Repository.getBranchData(gym.id,branch_code)
+        if(!branch_info){
+             console.log(branch_info);
+            console.log(typeof(branch_info));
+            throw new Error("401 branch not found")
+        }  
+        const branch = await Branch_Repository.get_branch(branch_info.id)
             if(!branch){
             throw new Error("Branch not found")
             }
@@ -122,6 +142,45 @@ class Branch_Services{
             Gym_name:gym.gym_name
         
     }
+}
+
+async update_branch(ownerId:string,updated_data:UpdateBranchDTO,branch_code:string){
+        const gym = await Branch_Repository.exists_gym(ownerId)
+            if(!gym){
+                throw new Error("401 Gym Not Found")
+            }
+        const branch_info = await Branch_Repository.getBranchData(gym.id,branch_code)
+        if(!branch_info){
+             console.log(branch_info);
+            console.log(typeof(branch_info));
+            throw new Error("401 branch not found")
+        }  
+        const result = await Branch_Repository.update_branch_data(updated_data,branch_info.id)
+        return result
+    }
+
+async delete_branch(ownerId:string,branch_code:string){
+    const gym = await Branch_Repository.exists_gym(ownerId)
+            if(!gym){
+                throw new Error("401 Gym Not Found")
+            }
+    const branch_info = await Branch_Repository.getBranchData(gym.id,branch_code)
+        if(!branch_info){
+             console.log(branch_info);
+            console.log(typeof(branch_info));
+            throw new Error("401 branch not found")
+        }  
+    const result = await Branch_Repository.delete_branch(branch_info.id)
+    return result
+}  
+
+async restore(ownerId:string,id:string){
+    const gym = await Branch_Repository.exists_gym(ownerId)
+     if(!gym){
+                throw new Error("401 Gym Not Found")
+            }
+    const result = await Branch_Repository.restore(id)
+    return result
 }
 }
 

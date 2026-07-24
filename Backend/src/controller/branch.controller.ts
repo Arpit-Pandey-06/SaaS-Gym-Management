@@ -63,7 +63,65 @@ class Branch_Controller{
         }
     }
 
+    async update_branch(req:Request,res:Response,next:NextFunction){
+        try{
+            const branch_code : string | any = req.params.branch_code
+            const result = await Branch_Services.update_branch(req.user.id,req.body,branch_code)
+            res.status(200).json({
+                success:true,
+                message:"Result Successfull",
+                data:result
+            })
+            
+        }
+        catch(err:any){
+            res.status(401).json({
+                success:false,
+                message:"Result not updated",
+                Error:err.toString()
+            })
+        }
+    }
 
+    async delet_branch(req:Request,res:Response,next:NextFunction){
+        try{
+            const branch_code : string | any = req.params.branch_code
+            const result = await Branch_Services.delete_branch(req.user.id,branch_code)
+            res.status(200).json({
+                success:true,
+                message:"Delete Successfull",
+                data:result
+            })
+            
+        }
+        catch(err:any){
+            res.status(401).json({
+                success:false,
+                message:"Delete not succesfull",
+                Error:err.toString()
+            })
+        }
+    }
+
+    async restore(req:Request,res:Response,next:NextFunction){
+        try{
+            const branch_code : string | any = req.params.branch_code
+            const result = await Branch_Services.delete_branch(req.user.id,branch_code)
+            res.status(200).json({
+                success:true,
+                message:"Restore Successfull",
+                data:result
+            })
+            
+        }
+        catch(err:any){
+            res.status(401).json({
+                success:false,
+                message:"Restore not succesfull",
+                Error:err.toString()
+            })
+        }
+    }
 }
 
 export default new Branch_Controller()

@@ -10,3 +10,17 @@ export interface RefreshTokenInterface{
     userId: string;
     expires_at: Date;
 }
+
+export type UpdateBranchDTO = {
+    branch_name:string,
+    business_email:string,
+    business_phone:string,
+    address:string,
+    city:string,
+    state:string,
+    country:string,
+    postal_code:string,
+    capacity:string,
+    opening_time:string,
+    closing_time:string,
+}

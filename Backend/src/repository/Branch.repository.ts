@@ -78,17 +78,57 @@ class Branch_Repository {
         })
     }
 
-    async get_branch(branch_code:string,gymId:string){
+    async get_branch(id:string){
         return await prisma.branch.findFirst({
             where:{
-                branch_code:branch_code,
-                gymId:gymId
+                id:id
             },
             select:{
                 branch_name:true,
                 status:true,
                 branch_code:true,
                 branch_type:true
+            }
+        })
+    }
+
+    async getBranchData(gymId:string,branch_code:string){
+        return await prisma.branch.findFirst({
+            where:{
+                gymId:gymId,
+                branch_code:branch_code,
+                deleted_at:null
+            }
+        })
+    }
+
+    async update_branch_data(update_data:any,id:string){
+        return await prisma.branch.update({
+            where:{
+               id:id
+            },
+
+            data:update_data
+        })
+    }
+
+    async delete_branch(id:string){
+        return await prisma.branch.update({
+            where:{
+                id:id
+            },
+            data:{
+                deleted_at:new Date()
+            }
+        })
+    }
+    async restore(id:string){
+        return await prisma.branch.update({
+            where:{
+                id:id
+            },
+            data:{
+                deleted_at:null
             }
         })
     }
